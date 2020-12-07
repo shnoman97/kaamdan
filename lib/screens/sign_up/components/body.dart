@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kaamdan/components/socal_card.dart';
 import 'package:kaamdan/constants.dart';
 import 'package:kaamdan/size_config.dart';
@@ -6,6 +8,8 @@ import 'package:kaamdan/size_config.dart';
 import 'sign_up_form.dart';
 
 class Body extends StatelessWidget {
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,7 +35,7 @@ class Body extends StatelessWidget {
                   children: [
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
-                      press: () {},
+                      press: _signInWithGoogle,
                     ),
                     SocalCard(
                       icon: "assets/icons/facebook-2.svg",
@@ -55,5 +59,19 @@ class Body extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _signInWithGoogle() async {
+    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+  );
+
+    final FirebaseUser user =
+        (await firebaseAuth.signInWithCredential(credential)).user;
   }
 }
